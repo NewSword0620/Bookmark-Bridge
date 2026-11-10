@@ -2,7 +2,7 @@
   "name": "two-way-bookmarks",
   "displayName": "Bookmark Bridge — Two-Way Bookmarks",
   "description": "Two-way bookmarks: jump from a bookmark in the tree to the code, and from the code straight back to the bookmark in the tree view.",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "publisher": "newsword0620",
   "author": {
     "name": "NewSword0620"
@@ -151,7 +151,7 @@
       },
       {
         "command": "codeBookmarks.toggleLabelDisplay",
-        "title": "Toggle Bookmark Label Display in Editor",
+        "title": "Cycle Bookmark Label Display in Editor",
         "category": "Bookmark Bridge",
         "icon": "$(symbol-string)"
       },
@@ -422,24 +422,6 @@
           "type": "boolean",
           "default": true,
           "description": "Highlight the background of bookmarked lines."
-        },
-        "codeBookmarks.labelDisplay": {
-          "type": "string",
-          "enum": [
-            "hover",
-            "inline"
-          ],
-          "enumDescriptions": [
-            "Show the label only in the hover of the bookmarked line.",
-            "Append the label to the end of the bookmarked line."
-          ],
-          "default": "hover",
-          "markdownDescription": "How bookmark labels are rendered in the editor. Flip it quickly with *Toggle Bookmark Label Display in Editor* (`Ctrl+Alt+Shift+L`)."
-        },
-        "codeBookmarks.showLabelOnHover": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Show the bookmark label, code snippet and location in the hover of the bookmarked line. Disabled by default, so bookmarks stay visually silent in the editor."
         },
         "codeBookmarks.persistToFile": {
           "type": "boolean",

@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Bookmark, BookmarkManager, makePreview } from './bookmarkManager';
 import { BookmarkNode, BookmarksTreeProvider, FileNode, TreeNode } from './bookmarksTree';
-import { BookmarkDecorations } from './decorations';
+import { BookmarkDecorations, LABEL_DISPLAY_DESCRIPTION } from './decorations';
 
 let manager: BookmarkManager;
 let provider: BookmarksTreeProvider;
@@ -37,7 +37,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('codeBookmarks.clear', () => clearBookmarks(false)),
     vscode.commands.registerCommand('codeBookmarks.clearFromAllFiles', () => clearBookmarks(true)),
     vscode.commands.registerCommand('codeBookmarks.revealInTree', () => revealCurrentLineInTree(false)),
-    vscode.commands.registerCommand('codeBookmarks.toggleLabelDisplay', () => toggleLabelDisplay()),
+    vscode.commands.registerCommand('codeBookmarks.toggleLabelDisplay', () => cycleLabelDisplay(decorations)),
     vscode.commands.registerCommand('codeBookmarks.openPersistenceFile', () => openPersistenceFile()),
     vscode.commands.registerCommand('codeBookmarks.mergeFromFile', () => mergeFromPickedFile()),
     vscode.commands.registerCommand('codeBookmarks.revealNearestInTree', () => revealCurrentLineInTree(true)),
@@ -208,13 +208,10 @@ async function toggleBookmark(labeled: boolean): Promise<void> {
   status(label ? `Bookmark labeled "${label}"` : 'Bookmark removed');
 }
 
-/** Switches the editor label rendering between "hover only" and "inline". */
-async function toggleLabelDisplay(): Promise<void> {
-  const config = vscode.workspace.getConfiguration('codeBookmarks');
-  const current = config.get<string>('labelDisplay', 'hover');
-  const next = current === 'inline' ? 'hover' : 'inline';
-  await config.update('labelDisplay', next, vscode.ConfigurationTarget.Global);
-  status(next === 'inline' ? 'Labels shown inline' : 'Labels shown on hover only');
+/** Cycles the editor label rendering: off -> hover -> end of line -> start of line. */
+async function cycleLabelDisplay(decorations: BookmarkDecorations): Promise<void> {
+  const mode = await decorations.cycleLabelDisplay();
+  status(LABEL_DISPLAY_DESCRIPTION[mode]);
 }
 
 /** Opens the JSON file that bookmarks are mirrored to. */

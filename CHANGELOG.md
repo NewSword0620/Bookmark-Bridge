@@ -2,6 +2,22 @@
 
 All notable changes to **Bookmark Bridge** are documented in this file.
 
+## [1.1.0] - 2026-11-10
+
+### Changed
+
+- Bookmark labels in the editor are now controlled by a single mode cycled with
+  the `ab` button in the view title or `Ctrl+Alt+Shift+L`:
+  *hidden* → *hover* → *end of line* → *start of line*.
+- New *start of line* mode keeps the label visible on very long lines, where a
+  label appended after the code would require horizontal scrolling.
+
+### Removed
+
+- The `codeBookmarks.labelDisplay` and `codeBookmarks.showLabelOnHover` settings.
+  The mode is remembered globally and toggled from the UI, so there is only one
+  place to control it. The default stays *hidden*.
+
 ## [1.0.2] - 2026-11-10
 
 First public release. Published as `two-way-bookmarks` with the display name
