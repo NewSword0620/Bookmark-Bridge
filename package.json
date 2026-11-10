@@ -1,0 +1,461 @@
+{
+  "name": "bookmark-bridge",
+  "displayName": "Bookmark Bridge",
+  "description": "Two-way bookmarks: jump from a bookmark in the tree to the code, and from the code straight back to the bookmark in the tree view.",
+  "version": "1.0.0",
+  "publisher": "newsword0620",
+  "author": {
+    "name": "NewSword0620"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NewSword0620/Bookmark-Bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NewSword0620/Bookmark-Bridge/issues"
+  },
+  "homepage": "https://github.com/NewSword0620/Bookmark-Bridge#readme",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "icon": "resources/icon-1-ribbon-arrows.png",
+  "galleryBanner": {
+    "color": "#0B1622",
+    "theme": "dark"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "bookmarks",
+    "bookmark",
+    "mark",
+    "marks",
+    "navigation",
+    "two-way",
+    "jump",
+    "bridge",
+    "breadcrumb",
+    "todo"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "clean": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\"",
+    "vscode:prepublish": "npm run compile",
+    "package": "npx --yes @vscode/vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "@types/vscode": "^1.75.0",
+    "sharp": "^0.35.5",
+    "typescript": "^5.3.3"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeBookmarks.toggle",
+        "title": "Toggle Bookmark",
+        "category": "Bookmark Bridge",
+        "icon": "$(bookmark)"
+      },
+      {
+        "command": "codeBookmarks.add",
+        "title": "Add Bookmark on Current Line",
+        "category": "Bookmark Bridge",
+        "icon": "$(add)"
+      },
+      {
+        "command": "codeBookmarks.toggleLabeled",
+        "title": "Toggle Bookmark with Label",
+        "category": "Bookmark Bridge",
+        "icon": "$(tag)"
+      },
+      {
+        "command": "codeBookmarks.next",
+        "title": "Jump to Next Bookmark",
+        "category": "Bookmark Bridge",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "codeBookmarks.prev",
+        "title": "Jump to Previous Bookmark",
+        "category": "Bookmark Bridge",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "codeBookmarks.revealInTree",
+        "title": "Reveal Bookmark Under Cursor in Bookmark Bridge View",
+        "category": "Bookmark Bridge",
+        "icon": "$(list-selection)"
+      },
+      {
+        "command": "codeBookmarks.revealNearestInTree",
+        "title": "Reveal Nearest Bookmark in Bookmark Bridge View",
+        "category": "Bookmark Bridge",
+        "icon": "$(list-flat)"
+      },
+      {
+        "command": "codeBookmarks.list",
+        "title": "List Bookmarks in Current File",
+        "category": "Bookmark Bridge",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "codeBookmarks.listFromAllFiles",
+        "title": "List Bookmarks in All Files",
+        "category": "Bookmark Bridge",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "codeBookmarks.clear",
+        "title": "Remove All Bookmarks in Current File",
+        "category": "Bookmark Bridge",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "codeBookmarks.clearFromAllFiles",
+        "title": "Remove All Bookmarks",
+        "category": "Bookmark Bridge",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "codeBookmarks.editLabel",
+        "title": "Edit Bookmark Label",
+        "category": "Bookmark Bridge",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "codeBookmarks.clearLabel",
+        "title": "Clear Bookmark Label",
+        "category": "Bookmark Bridge",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "codeBookmarks.removeBookmark",
+        "title": "Remove Bookmark",
+        "category": "Bookmark Bridge",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "codeBookmarks.removeFileBookmarks",
+        "title": "Remove All Bookmarks of This File",
+        "category": "Bookmark Bridge",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "codeBookmarks.toggleLabelDisplay",
+        "title": "Toggle Bookmark Label Display in Editor",
+        "category": "Bookmark Bridge",
+        "icon": "$(symbol-string)"
+      },
+      {
+        "command": "codeBookmarks.openPersistenceFile",
+        "title": "Open Bookmarks JSON File",
+        "category": "Bookmark Bridge",
+        "icon": "$(json)"
+      },
+      {
+        "command": "codeBookmarks.mergeFromFile",
+        "title": "Merge Bookmarks from JSON File...",
+        "category": "Bookmark Bridge",
+        "icon": "$(git-merge)"
+      },
+      {
+        "command": "codeBookmarks._openBookmark",
+        "title": "Open Bookmark",
+        "category": "Bookmark Bridge"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeBookmarks",
+          "title": "Bookmark Bridge",
+          "icon": "resources/bookmarks-view.svg"
+        }
+      ]
+    },
+    "views": {
+      "codeBookmarks": [
+        {
+          "id": "codeBookmarks.view",
+          "name": "Bookmark Bridge",
+          "contextualTitle": "Bookmark Bridge"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "codeBookmarks.view",
+        "contents": "No bookmarks yet.\nBookmark the current line, then come back here to see the list.\n[Add Bookmark](command:codeBookmarks.toggle)\nTip: put the cursor on a bookmarked line and run **Reveal Bookmark Under Cursor in Bookmark Bridge View** to jump from code to this list."
+      }
+    ],
+    "submenus": [
+      {
+        "id": "codeBookmarks.editorMenu",
+        "label": "Bookmark Bridge",
+        "icon": "$(bookmark)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "codeBookmarks._openBookmark",
+          "when": "false"
+        },
+        {
+          "command": "codeBookmarks.removeBookmark",
+          "when": "false"
+        },
+        {
+          "command": "codeBookmarks.clearLabel",
+          "when": "false"
+        },
+        {
+          "command": "codeBookmarks.removeFileBookmarks",
+          "when": "false"
+        },
+        {
+          "command": "codeBookmarks.editLabel",
+          "when": "view == codeBookmarks.view"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "codeBookmarks.editorMenu",
+          "group": "navigation@10",
+          "when": "editorTextFocus"
+        }
+      ],
+      "codeBookmarks.editorMenu": [
+        {
+          "command": "codeBookmarks.add",
+          "group": "1_add@1"
+        },
+        {
+          "command": "codeBookmarks.toggle",
+          "group": "1_add@2"
+        },
+        {
+          "command": "codeBookmarks.toggleLabeled",
+          "group": "1_add@3"
+        },
+        {
+          "command": "codeBookmarks.revealInTree",
+          "group": "2_nav@1"
+        },
+        {
+          "command": "codeBookmarks.revealNearestInTree",
+          "group": "2_nav@2"
+        },
+        {
+          "command": "codeBookmarks.next",
+          "group": "2_nav@3"
+        },
+        {
+          "command": "codeBookmarks.prev",
+          "group": "2_nav@4"
+        },
+        {
+          "command": "codeBookmarks.list",
+          "group": "2_nav@5"
+        },
+        {
+          "command": "codeBookmarks.listFromAllFiles",
+          "group": "2_nav@6"
+        },
+        {
+          "command": "codeBookmarks.clear",
+          "group": "3_remove@1"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "codeBookmarks.clear",
+          "group": "1_modification@10"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "codeBookmarks.add",
+          "group": "navigation@0",
+          "when": "view == codeBookmarks.view"
+        },
+        {
+          "command": "codeBookmarks.listFromAllFiles",
+          "group": "navigation@1",
+          "when": "view == codeBookmarks.view"
+        },
+        {
+          "command": "codeBookmarks.toggleLabelDisplay",
+          "group": "navigation@3",
+          "when": "view == codeBookmarks.view"
+        },
+        {
+          "command": "codeBookmarks.mergeFromFile",
+          "group": "navigation@4",
+          "when": "view == codeBookmarks.view"
+        },
+        {
+          "command": "codeBookmarks.openPersistenceFile",
+          "group": "navigation@5",
+          "when": "view == codeBookmarks.view"
+        },
+        {
+          "command": "codeBookmarks.clearFromAllFiles",
+          "group": "navigation@2",
+          "when": "view == codeBookmarks.view"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "codeBookmarks.editLabel",
+          "group": "inline@1",
+          "when": "view == codeBookmarks.view && viewItem =~ /^bookmark/"
+        },
+        {
+          "command": "codeBookmarks.clearLabel",
+          "group": "inline@2",
+          "when": "view == codeBookmarks.view && viewItem == bookmark:labeled"
+        },
+        {
+          "command": "codeBookmarks.removeBookmark",
+          "group": "inline@3",
+          "when": "view == codeBookmarks.view && viewItem =~ /^bookmark/"
+        },
+        {
+          "command": "codeBookmarks.editLabel",
+          "group": "1_modification@1",
+          "when": "view == codeBookmarks.view && viewItem =~ /^bookmark/"
+        },
+        {
+          "command": "codeBookmarks.clearLabel",
+          "group": "1_modification@2",
+          "when": "view == codeBookmarks.view && viewItem == bookmark:labeled"
+        },
+        {
+          "command": "codeBookmarks.removeBookmark",
+          "group": "1_modification@3",
+          "when": "view == codeBookmarks.view && viewItem =~ /^bookmark/"
+        },
+        {
+          "command": "codeBookmarks.removeFileBookmarks",
+          "group": "1_modification@1",
+          "when": "view == codeBookmarks.view && viewItem == file"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "codeBookmarks.toggle",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "codeBookmarks.toggleLabeled",
+        "key": "ctrl+alt+shift+k",
+        "mac": "cmd+alt+shift+k",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "codeBookmarks.next",
+        "key": "ctrl+alt+right",
+        "mac": "cmd+alt+right",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "codeBookmarks.prev",
+        "key": "ctrl+alt+left",
+        "mac": "cmd+alt+left",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "codeBookmarks.revealInTree",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "codeBookmarks.list",
+        "key": "ctrl+alt+j",
+        "mac": "cmd+alt+j"
+      },
+      {
+        "command": "codeBookmarks.toggleLabelDisplay",
+        "key": "ctrl+alt+shift+l",
+        "mac": "cmd+alt+shift+l"
+      },
+      {
+        "command": "codeBookmarks.listFromAllFiles",
+        "key": "ctrl+alt+shift+j",
+        "mac": "cmd+alt+shift+j"
+      }
+    ],
+    "configuration": {
+      "title": "Bookmark Bridge",
+      "properties": {
+        "codeBookmarks.autoRevealInTree": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When the cursor moves onto a bookmarked line and the Bookmarks view is visible, automatically select that bookmark in the tree."
+        },
+        "codeBookmarks.revealDistance": {
+          "type": "number",
+          "default": 20,
+          "minimum": 0,
+          "markdownDescription": "When the cursor line itself has no bookmark, `Reveal Bookmark Under Cursor` falls back to the closest bookmark within this many lines. Set to `0` to disable the fallback."
+        },
+        "codeBookmarks.showGutterIcon": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a bookmark icon in the editor gutter."
+        },
+        "codeBookmarks.showLineHighlight": {
+          "type": "boolean",
+          "default": true,
+          "description": "Highlight the background of bookmarked lines."
+        },
+        "codeBookmarks.labelDisplay": {
+          "type": "string",
+          "enum": [
+            "hover",
+            "inline"
+          ],
+          "enumDescriptions": [
+            "Show the label only in the hover of the bookmarked line.",
+            "Append the label to the end of the bookmarked line."
+          ],
+          "default": "hover",
+          "markdownDescription": "How bookmark labels are rendered in the editor. Flip it quickly with *Toggle Bookmark Label Display in Editor* (`Ctrl+Alt+Shift+L`)."
+        },
+        "codeBookmarks.showLabelOnHover": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Show the bookmark label, code snippet and location in the hover of the bookmarked line. Disabled by default, so bookmarks stay visually silent in the editor."
+        },
+        "codeBookmarks.persistToFile": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Save bookmarks to a local JSON file in real time (in addition to the per-workspace state). The file is watched, so edits made by another window or by hand are picked up automatically."
+        },
+        "codeBookmarks.persistenceFile": {
+          "type": "string",
+          "default": "${workspaceFolder}/.vscode/bookmarks.json",
+          "markdownDescription": "Path of the bookmarks JSON file (created automatically). Supports `~` and `${workspaceFolder}`; a plain absolute path is used as is, e.g. `D:\\Software\\Ubuntu\\share\\bookmarks.json` for one central file. Files inside a workspace folder are stored as relative paths, so a shared file keeps working across projects. Without an open folder, file persistence stays inactive."
+        },
+        "codeBookmarks.preserveFocusWhenOpeningFromTree": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Keep the keyboard focus in the Bookmarks view when opening a bookmark from the tree. Useful for browsing bookmarks with the arrow keys."
+        }
+      }
+    }
+  }
+}
