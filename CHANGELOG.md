@@ -7,17 +7,18 @@ All notable changes to **Bookmark Bridge** are documented in this file.
 ### Changed
 
 - Bookmark labels in the editor are now controlled by a single mode, chosen from
-  a picker opened by the `ab` button in the view title or `Ctrl+Alt+Shift+L`:
-  *hidden*, *hover*, *end of line*, *start of line*.
+  a picker opened by the eye button in the view title, the status bar item, or
+  `Ctrl+Alt+Shift+L`: *hidden*, *hover*, *end of line*, *start of line*. The
+  picker marks the active mode.
 - New *start of line* mode keeps the label visible on very long lines, where a
   label appended after the code would require horizontal scrolling.
-- A status bar indicator (`$(bookmark) Labels: …`) always shows the active mode;
-  clicking it cycles through the modes as well.
+- A status bar indicator (`Bookmark Bridge — Labels: …`) always shows the active
+  mode; clicking it opens the mode picker.
 
 ### Removed
 
 - The `codeBookmarks.labelDisplay` and `codeBookmarks.showLabelOnHover` settings.
-  The mode is remembered globally and toggled from the UI, so there is only one
+  The mode is remembered globally and chosen from the UI, so there is only one
   place to control it. The default stays *hidden*.
 
 ## [1.0.2] - 2026-11-10

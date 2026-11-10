@@ -82,7 +82,7 @@ single submenu.
 | `+` | Add a bookmark on the current line |
 | list | List bookmarks of all files |
 | trash | Remove all bookmarks |
-| `ab` | Pick the label display mode (hidden / hover / end of line / start of line) |
+| eye | Pick the label display mode (hidden / hover / end of line / start of line) |
 | merge | **Merge bookmarks from a JSON file…** (file picker + confirmation) |
 | `{}` | Open the bookmarks JSON file |
 
@@ -98,10 +98,10 @@ single submenu.
 | `codeBookmarks.persistenceFile` | `${workspaceFolder}/.vscode/bookmarks.json` | Path of that file. Supports `~` and `${workspaceFolder}`, or any absolute path for one central file. |
 | `codeBookmarks.preserveFocusWhenOpeningFromTree` | `false` | Keep the focus in the view while browsing bookmarks with the arrow keys. |
 
-The editor label mode is intentionally **not** a setting. Click the `ab` button
-in the view title, the status bar item (`🔖 Labels: …`) or press
-`Ctrl+Alt+Shift+L` to open the mode picker; the active mode is marked in the list
-and always visible in the status bar. The choice is remembered across windows.
+The editor label mode is intentionally **not** a setting. Click the eye button in
+the view title, the status bar item (`🔖 Labels: …`) or press `Ctrl+Alt+Shift+L`
+to open the mode picker; the active mode is marked in the list and always visible
+in the status bar. The choice is remembered across windows.
 
 ## JSON file format
 
