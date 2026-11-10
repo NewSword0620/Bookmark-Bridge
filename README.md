@@ -143,7 +143,7 @@ npm install
 npm run compile      # or: npm run watch
 
 # press F5 in VS Code ("Run Extension") to try it in a second window
-npm run package      # builds two-way-bookmarks-1.0.1.vsix
+npm run package      # builds two-way-bookmarks-1.0.2.vsix
 ```
 
 ## Feedback

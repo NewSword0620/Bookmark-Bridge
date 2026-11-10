@@ -2,10 +2,11 @@
 
 All notable changes to **Bookmark Bridge** are documented in this file.
 
-## [1.0.1] - 2026-11-10
+## [1.0.2] - 2026-11-10
 
-First public release. Published as `two-way-bookmarks`, because the extension name
-`bookmark-bridge` is already reserved in the Marketplace.
+First public release. Published as `two-way-bookmarks` with the display name
+*Bookmark Bridge — Two-Way Bookmarks*, because both `bookmark-bridge` and the
+display name *Bookmark Bridge* are already reserved in the Marketplace.
 
 ### Added
 
