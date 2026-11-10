@@ -4,9 +4,9 @@
 from the bookmark list to the code — and, unlike most bookmark extensions, jump
 straight back from the code to the bookmark in the list.
 
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/newsword0620.bookmark-bridge)
-![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/newsword0620.bookmark-bridge)
-![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/newsword0620.bookmark-bridge)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/newsword0620.two-way-bookmarks)
+![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/newsword0620.two-way-bookmarks)
+![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/newsword0620.two-way-bookmarks)
 ![License](https://img.shields.io/github/license/NewSword0620/Bookmark-Bridge)
 
 <!--
@@ -143,7 +143,7 @@ npm install
 npm run compile      # or: npm run watch
 
 # press F5 in VS Code ("Run Extension") to try it in a second window
-npm run package      # builds bookmark-bridge-1.0.0.vsix
+npm run package      # builds two-way-bookmarks-1.0.1.vsix
 ```
 
 ## Feedback
