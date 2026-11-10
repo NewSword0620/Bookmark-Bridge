@@ -48,11 +48,12 @@
     "watch": "tsc -watch -p ./",
     "clean": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\"",
     "vscode:prepublish": "npm run compile",
-    "package": "npx --yes @vscode/vsce package --no-dependencies"
+    "package": "vsce package --no-dependencies"
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
     "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^4.1.0",
     "sharp": "^0.35.5",
     "typescript": "^5.3.3"
   },

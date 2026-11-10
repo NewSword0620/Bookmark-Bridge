@@ -26,4 +26,4 @@ jobs:
         run: npm ci
 
       - name: Publish to the VS Code Marketplace
-        run: npx --yes @vscode/vsce publish --oidc
+        run: npx vsce publish --oidc
