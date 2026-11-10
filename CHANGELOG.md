@@ -2,13 +2,35 @@
 
 All notable changes to **Bookmark Bridge** are documented in this file.
 
-## [Unreleased]
+## [1.2.0] - 2026-11-10
+
+### Added
+
+- Star (favourite) bookmarks: hover a bookmark in the view and click the star
+  button to mark it; starred bookmarks are drawn with a yellow star icon. The
+  flag is kept in the bookmarks JSON as `"starred": true`.
+- A **Starred** group at the top of the view collects every starred bookmark of
+  the workspace (they stay in their file group as well), showing `file:line`
+  next to each entry.
+- A single **expand / collapse all** button in the view title: it shows *collapse*
+  while the tree is expanded and flips to *expand* after collapsing. The
+  `Expand All Bookmarks` / `Collapse All Bookmarks` commands are also in the
+  command palette.
+
+### Changed
+
+- The *merge bookmarks* button in the view title now uses the file-add icon.
 
 ### Fixed
 
+- The silent cursor sync no longer force-expands a file group you collapsed: it
+  only highlights that file row, leaving the layout you arranged untouched.
+  `Ctrl+Alt+B` still expands and focuses the bookmark.
 - The bookmark hover is now shown only in the *On hover* mode. It used to appear
   in the *end of line* and *start of line* modes as well, where the label is
   already visible.
+- Corrected the 1.1.0 entry above (button icon and picker wording) and the
+  matching README sections, which described the old cycling behaviour.
 
 ## [1.1.0] - 2026-11-10
 

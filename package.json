@@ -2,7 +2,7 @@
   "name": "two-way-bookmarks",
   "displayName": "Bookmark Bridge — Two-Way Bookmarks",
   "description": "Two-way bookmarks: jump from a bookmark in the tree to the code, and from the code straight back to the bookmark in the tree view.",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "publisher": "newsword0620",
   "author": {
     "name": "NewSword0620"
@@ -114,6 +114,18 @@
         "icon": "$(list-tree)"
       },
       {
+        "command": "codeBookmarks.expandAll",
+        "title": "Expand All Bookmarks",
+        "category": "Bookmark Bridge",
+        "icon": "$(expand-all)"
+      },
+      {
+        "command": "codeBookmarks.collapseAll",
+        "title": "Collapse All Bookmarks",
+        "category": "Bookmark Bridge",
+        "icon": "$(collapse-all)"
+      },
+      {
         "command": "codeBookmarks.clear",
         "title": "Remove All Bookmarks in Current File",
         "category": "Bookmark Bridge",
@@ -130,6 +142,12 @@
         "title": "Edit Bookmark Label",
         "category": "Bookmark Bridge",
         "icon": "$(edit)"
+      },
+      {
+        "command": "codeBookmarks.toggleStar",
+        "title": "Toggle Bookmark Star",
+        "category": "Bookmark Bridge",
+        "icon": "$(star-empty)"
       },
       {
         "command": "codeBookmarks.clearLabel",
@@ -165,7 +183,7 @@
         "command": "codeBookmarks.mergeFromFile",
         "title": "Merge Bookmarks from JSON File...",
         "category": "Bookmark Bridge",
-        "icon": "$(git-merge)"
+        "icon": "$(file-add)"
       },
       {
         "command": "codeBookmarks._openBookmark",
@@ -212,6 +230,10 @@
         },
         {
           "command": "codeBookmarks.removeBookmark",
+          "when": "false"
+        },
+        {
+          "command": "codeBookmarks.toggleStar",
           "when": "false"
         },
         {
@@ -294,27 +316,42 @@
           "when": "view == codeBookmarks.view"
         },
         {
-          "command": "codeBookmarks.toggleLabelDisplay",
-          "group": "navigation@3",
-          "when": "view == codeBookmarks.view"
+          "command": "codeBookmarks.expandAll",
+          "group": "navigation@2",
+          "when": "view == codeBookmarks.view && !codeBookmarks.treeExpanded"
         },
         {
-          "command": "codeBookmarks.mergeFromFile",
+          "command": "codeBookmarks.collapseAll",
+          "group": "navigation@2",
+          "when": "view == codeBookmarks.view && codeBookmarks.treeExpanded"
+        },
+        {
+          "command": "codeBookmarks.clearFromAllFiles",
           "group": "navigation@4",
           "when": "view == codeBookmarks.view"
         },
         {
-          "command": "codeBookmarks.openPersistenceFile",
+          "command": "codeBookmarks.toggleLabelDisplay",
           "group": "navigation@5",
           "when": "view == codeBookmarks.view"
         },
         {
-          "command": "codeBookmarks.clearFromAllFiles",
-          "group": "navigation@2",
+          "command": "codeBookmarks.mergeFromFile",
+          "group": "navigation@6",
+          "when": "view == codeBookmarks.view"
+        },
+        {
+          "command": "codeBookmarks.openPersistenceFile",
+          "group": "navigation@7",
           "when": "view == codeBookmarks.view"
         }
       ],
       "view/item/context": [
+        {
+          "command": "codeBookmarks.toggleStar",
+          "group": "inline@0",
+          "when": "view == codeBookmarks.view && viewItem =~ /^bookmark/"
+        },
         {
           "command": "codeBookmarks.editLabel",
           "group": "inline@1",
@@ -323,11 +360,16 @@
         {
           "command": "codeBookmarks.clearLabel",
           "group": "inline@2",
-          "when": "view == codeBookmarks.view && viewItem == bookmark:labeled"
+          "when": "view == codeBookmarks.view && viewItem =~ /:labeled/"
         },
         {
           "command": "codeBookmarks.removeBookmark",
           "group": "inline@3",
+          "when": "view == codeBookmarks.view && viewItem =~ /^bookmark/"
+        },
+        {
+          "command": "codeBookmarks.toggleStar",
+          "group": "1_modification@0",
           "when": "view == codeBookmarks.view && viewItem =~ /^bookmark/"
         },
         {
@@ -338,7 +380,7 @@
         {
           "command": "codeBookmarks.clearLabel",
           "group": "1_modification@2",
-          "when": "view == codeBookmarks.view && viewItem == bookmark:labeled"
+          "when": "view == codeBookmarks.view && viewItem =~ /:labeled/"
         },
         {
           "command": "codeBookmarks.removeBookmark",

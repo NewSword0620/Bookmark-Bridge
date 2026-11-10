@@ -11,6 +11,8 @@ export interface Bookmark {
   label?: string;
   /** Snippet of the bookmarked line, used by the tree view when the file is closed. */
   preview?: string;
+  /** Starred ("favourite") bookmarks are marked with a yellow star. */
+  starred?: boolean;
 }
 
 export interface FileBookmarks {
@@ -29,6 +31,7 @@ interface PersistedBookmark {
   column: number;
   label?: string;
   preview?: string;
+  starred?: boolean;
 }
 
 const STORAGE_KEY = 'codeBookmarks.data';
@@ -52,6 +55,7 @@ function normalize(bookmark: Bookmark): Bookmark {
     column: Math.max(0, Math.trunc(bookmark.column ?? 0)),
     label: label ? label : undefined,
     preview: bookmark.preview,
+    starred: bookmark.starred ? true : undefined,
   };
 }
 
@@ -69,6 +73,9 @@ function fromPersisted(raw: PersistedBookmark): Bookmark | undefined {
   if (typeof raw.preview === 'string' && raw.preview.trim()) {
     bookmark.preview = raw.preview;
   }
+  if (raw.starred === true) {
+    bookmark.starred = true;
+  }
   return bookmark;
 }
 
@@ -79,6 +86,9 @@ function toPersisted(bookmark: Bookmark): PersistedBookmark {
   }
   if (bookmark.preview) {
     result.preview = bookmark.preview;
+  }
+  if (bookmark.starred) {
+    result.starred = true;
   }
   return result;
 }
@@ -233,6 +243,18 @@ export class BookmarkManager implements vscode.Disposable {
     }
     target.label = label?.trim() ? label.trim() : undefined;
     this.changed();
+  }
+
+  /** Toggles the star of a bookmark and returns the new state. */
+  toggleStar(uri: string, line: number): boolean {
+    const target = this.find(uri, line);
+    if (!target) {
+      return false;
+    }
+    const starred = !target.starred;
+    target.starred = starred ? true : undefined;
+    this.changed();
+    return starred;
   }
 
   remove(uri: string, line: number): void {

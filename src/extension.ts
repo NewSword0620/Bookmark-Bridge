@@ -26,8 +26,30 @@ export function activate(context: vscode.ExtensionContext): void {
 
   treeView = vscode.window.createTreeView('codeBookmarks.view', {
     treeDataProvider: provider,
-    showCollapseAll: true,
+    // Custom expand/collapse buttons instead of the built-in one, so the pair
+    // can sit next to each other in the title bar.
+    showCollapseAll: false,
   });
+
+  // The expand/collapse button is a single button whose icon follows this key.
+  void vscode.commands.executeCommand('setContext', 'codeBookmarks.treeExpanded', true);
+
+  // Track which groups the user collapsed, so the silent "follow the cursor"
+  // reveal can highlight a collapsed file instead of forcing it open.
+  context.subscriptions.push(
+    treeView.onDidExpandElement((e) => {
+      const key = provider.groupKey(e.element);
+      if (key) {
+        provider.setGroupExpanded(key, true);
+      }
+    }),
+    treeView.onDidCollapseElement((e) => {
+      const key = provider.groupKey(e.element);
+      if (key) {
+        provider.setGroupExpanded(key, false);
+      }
+    })
+  );
 
   // Always-visible indicator of the current label mode: the view button cycles
   // through four modes, so the mode itself has to be visible somewhere.
@@ -62,6 +84,8 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('codeBookmarks.listFromAllFiles', () => listBookmarks(true)),
     vscode.commands.registerCommand('codeBookmarks.clear', () => clearBookmarks(false)),
     vscode.commands.registerCommand('codeBookmarks.clearFromAllFiles', () => clearBookmarks(true)),
+    vscode.commands.registerCommand('codeBookmarks.expandAll', () => setTreeExpanded(true)),
+    vscode.commands.registerCommand('codeBookmarks.collapseAll', () => setTreeExpanded(false)),
     vscode.commands.registerCommand('codeBookmarks.revealInTree', () => revealCurrentLineInTree(false)),
     vscode.commands.registerCommand('codeBookmarks.toggleLabelDisplay', () => selectLabelDisplay(decorations)),
     vscode.commands.registerCommand('codeBookmarks.openPersistenceFile', () => openPersistenceFile()),
@@ -78,6 +102,16 @@ export function activate(context: vscode.ExtensionContext): void {
         return editLabel(node);
       }
       return undefined;
+    }),
+    vscode.commands.registerCommand('codeBookmarks.toggleStar', (node?: BookmarkNode) => {
+      if (node) {
+        const starred = manager.toggleStar(node.uri.toString(), node.line);
+        status(
+          starred
+            ? `Starred bookmark (line ${node.line + 1})`
+            : `Star removed (line ${node.line + 1})`
+        );
+      }
     }),
     vscode.commands.registerCommand('codeBookmarks.clearLabel', (node?: BookmarkNode) => {
       if (node) {
@@ -118,6 +152,15 @@ export function activate(context: vscode.ExtensionContext): void {
 
 export function deactivate(): void {
   // Everything is disposed through context.subscriptions.
+}
+
+/**
+ * Expands or collapses every group and flips the icon of the single title bar
+ * button (the button shows "collapse" while the tree is expanded).
+ */
+async function setTreeExpanded(expanded: boolean): Promise<void> {
+  provider.setAllExpanded(expanded);
+  await vscode.commands.executeCommand('setContext', 'codeBookmarks.treeExpanded', expanded);
 }
 
 // --------------------------------------------------------------- helpers

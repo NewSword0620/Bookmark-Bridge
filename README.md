@@ -24,8 +24,8 @@ scroll the tree and hunt for the line you are standing on.
 Bookmark Bridge closes that loop:
 
 ```
-   Bookmarks view  ──────────►  code            (click a bookmark)
-   code  ──────────────────►  Bookmarks view    (Ctrl+Alt+B)
+   Bookmark Bridge view  ────►  code          (click a bookmark)
+   code  ───────────────────►  Bookmark Bridge view   (Ctrl+Alt+B)
 ```
 
 ## The two-way jump
@@ -40,18 +40,20 @@ Bookmark Bridge closes that loop:
   used, and you are asked before jumping further away.
 * **Automatic sync** — while the view is visible, moving the cursor onto a
   bookmarked line selects that bookmark in the tree, without stealing the focus
-  from the editor (`autoRevealInTree`, on by default).
+  from the editor (`autoRevealInTree`, on by default). A file group you collapsed
+  is only highlighted, never expanded.
 
 ## Features
 
 * Bookmark any line, with multi-cursor support.
-* Optional **labels** per bookmark, rendered in four modes you cycle with one
-  button: hidden, hover only, at the end of the line, or at the start of the line.
+* Optional **labels** per bookmark, rendered in four modes picked from one button:
+  hidden, hover only, at the end of the line, or at the start of the line.
 * Gutter icon and line highlight, in a soft blue that fits dark and light themes.
 * Next / previous bookmark navigation, per file.
 * Quick pick list of bookmarks in the current file or in the whole workspace.
-* File-grouped tree view with inline *edit label*, *clear label* and *remove*
-  actions.
+* File-grouped tree view with inline *star*, *edit label*, *clear label* and
+  *remove* actions; starred bookmarks get a yellow star and are collected in a
+  **Starred** group at the top of the view.
 * **Bookmarks survive edits**: line numbers follow inserted/removed lines and
   file renames.
 * **Live JSON persistence**: bookmarks are mirrored to a JSON file in real time,
@@ -81,10 +83,14 @@ single submenu.
 | --- | --- |
 | `+` | Add a bookmark on the current line |
 | list | List bookmarks of all files |
+| expand / collapse | One toggle: collapses all groups, then expands them again |
 | trash | Remove all bookmarks |
 | eye | Pick the label display mode (hidden / hover / end of line / start of line) |
-| merge | **Merge bookmarks from a JSON file…** (file picker + confirmation) |
+| file + | **Merge bookmarks from a JSON file…** (file picker + confirmation) |
 | `{}` | Open the bookmarks JSON file |
+
+Every bookmark row additionally shows inline *star*, *edit label*, *clear label*
+and *remove* buttons on hover.
 
 ## Settings
 
@@ -114,7 +120,7 @@ Bookmarks are stored per workspace and, when `persistToFile` is on, mirrored to
     {
       "path": "src/estimator.cpp",
       "bookmarks": [
-        { "line": 174, "column": 28, "label": "feature extraction" },
+        { "line": 174, "column": 28, "label": "feature extraction", "starred": true },
         { "line": 200, "column": 18, "preview": "updatePose();" }
       ]
     }
@@ -122,7 +128,7 @@ Bookmarks are stored per workspace and, when `persistToFile` is on, mirrored to
 }
 ```
 
-* `line` is zero-based; `column`, `label` and `preview` are optional.
+* `line` is zero-based; `column`, `label`, `preview` and `starred` are optional.
 * Files inside a workspace folder are written as relative paths, so the same file
   can be shared between projects and operating systems.
 * Entries belonging to other workspaces are preserved untouched when a shared
@@ -147,7 +153,7 @@ npm install
 npm run compile      # or: npm run watch
 
 # press F5 in VS Code ("Run Extension") to try it in a second window
-npm run package      # builds two-way-bookmarks-1.0.2.vsix
+npm run package      # builds two-way-bookmarks-<version>.vsix
 ```
 
 ## Feedback
@@ -163,8 +169,10 @@ Issues and feature requests are welcome in the
 也能用 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>B</kbd> 把光标所在的代码位置反向定位到书签目录，
 自动展开文件并选中该书签、把焦点交给列表。
 
-- 支持多光标打书签、带标签书签，标签可只在悬停时显示
-- 浅蓝色标签图标与行高亮，暗色/亮色主题都清晰
-- 编辑时行号自动跟随，文件重命名也不会错位
+- 支持多光标打书签、带标签书签
+- 标签四种显示方式：隐藏 / 悬停 / 行尾 / 行首，用标题栏眼睛按钮、状态栏或 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> 选择
+- 书签可加星收藏，星标条目会汇总到顶部的 **Starred** 分组
+- 浅蓝色书签图标与行高亮，暗色/亮色主题都清晰
+- 编辑时行号自动跟随，文件重命名也不会错位；自动同步时不会强制展开你已折叠的文件
 - 书签实时写入 `.vscode/bookmarks.json`，可手动编辑、跨机器同步；也可从任意 JSON 文件合并（合并前确认）
-- 右键菜单统一收纳在 **Bookmark Bridge** 二级菜单里
+- 全部展开 / 折叠一键切换，右键菜单统一收纳在 **Bookmark Bridge** 二级菜单里
