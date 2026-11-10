@@ -2,7 +2,14 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Bookmark, BookmarkManager, makePreview } from './bookmarkManager';
 import { BookmarkNode, BookmarksTreeProvider, FileNode, TreeNode } from './bookmarksTree';
-import { BookmarkDecorations, LABEL_DISPLAY_DESCRIPTION } from './decorations';
+import {
+  BookmarkDecorations,
+  LABEL_DISPLAY_CYCLE,
+  LABEL_DISPLAY_DESCRIPTION,
+  LABEL_DISPLAY_PICKER,
+  LABEL_DISPLAY_SHORT,
+  LabelDisplay,
+} from './decorations';
 
 let manager: BookmarkManager;
 let provider: BookmarksTreeProvider;
@@ -22,6 +29,25 @@ export function activate(context: vscode.ExtensionContext): void {
     showCollapseAll: true,
   });
 
+  // Always-visible indicator of the current label mode: the view button cycles
+  // through four modes, so the mode itself has to be visible somewhere.
+  const labelIndicator = vscode.window.createStatusBarItem(
+    'codeBookmarks.labelDisplay',
+    vscode.StatusBarAlignment.Right,
+    100
+  );
+  const updateLabelIndicator = (mode: LabelDisplay): void => {
+    labelIndicator.text = `$(bookmark) Labels: ${LABEL_DISPLAY_SHORT[mode]}`;
+    labelIndicator.tooltip = new vscode.MarkdownString(
+      `**Bookmark Bridge** — label display: **${LABEL_DISPLAY_SHORT[mode]}**\n\n` +
+        'Click to choose another mode'
+    );
+    labelIndicator.command = 'codeBookmarks.toggleLabelDisplay';
+    labelIndicator.show();
+  };
+  updateLabelIndicator(decorations.getLabelDisplay());
+  context.subscriptions.push(labelIndicator, decorations.onDidChangeLabelDisplay(updateLabelIndicator));
+
   context.subscriptions.push(
     manager,
     provider,
@@ -37,7 +63,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('codeBookmarks.clear', () => clearBookmarks(false)),
     vscode.commands.registerCommand('codeBookmarks.clearFromAllFiles', () => clearBookmarks(true)),
     vscode.commands.registerCommand('codeBookmarks.revealInTree', () => revealCurrentLineInTree(false)),
-    vscode.commands.registerCommand('codeBookmarks.toggleLabelDisplay', () => cycleLabelDisplay(decorations)),
+    vscode.commands.registerCommand('codeBookmarks.toggleLabelDisplay', () => selectLabelDisplay(decorations)),
     vscode.commands.registerCommand('codeBookmarks.openPersistenceFile', () => openPersistenceFile()),
     vscode.commands.registerCommand('codeBookmarks.mergeFromFile', () => mergeFromPickedFile()),
     vscode.commands.registerCommand('codeBookmarks.revealNearestInTree', () => revealCurrentLineInTree(true)),
@@ -208,10 +234,31 @@ async function toggleBookmark(labeled: boolean): Promise<void> {
   status(label ? `Bookmark labeled "${label}"` : 'Bookmark removed');
 }
 
-/** Cycles the editor label rendering: off -> hover -> end of line -> start of line. */
-async function cycleLabelDisplay(decorations: BookmarkDecorations): Promise<void> {
-  const mode = await decorations.cycleLabelDisplay();
-  status(LABEL_DISPLAY_DESCRIPTION[mode]);
+interface LabelDisplayPick extends vscode.QuickPickItem {
+  mode: LabelDisplay;
+}
+
+/** Dropdown-style picker for the editor label mode, marking the active one. */
+async function selectLabelDisplay(decorations: BookmarkDecorations): Promise<void> {
+  const current = decorations.getLabelDisplay();
+  const items: LabelDisplayPick[] = LABEL_DISPLAY_CYCLE.map((mode) => ({
+    label: LABEL_DISPLAY_PICKER[mode].title,
+    description: mode === current ? 'current' : undefined,
+    detail: LABEL_DISPLAY_PICKER[mode].detail,
+    iconPath: new vscode.ThemeIcon(LABEL_DISPLAY_PICKER[mode].icon),
+    mode,
+  }));
+
+  const picked = await vscode.window.showQuickPick(items, {
+    title: 'Bookmark Label Display',
+    placeHolder: `Current: ${LABEL_DISPLAY_SHORT[current]}`,
+  });
+  if (!picked) {
+    return;
+  }
+
+  await decorations.setLabelDisplay(picked.mode);
+  status(LABEL_DISPLAY_DESCRIPTION[picked.mode]);
 }
 
 /** Opens the JSON file that bookmarks are mirrored to. */

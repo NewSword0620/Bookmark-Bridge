@@ -151,9 +151,9 @@
       },
       {
         "command": "codeBookmarks.toggleLabelDisplay",
-        "title": "Cycle Bookmark Label Display in Editor",
+        "title": "Select Bookmark Label Display…",
         "category": "Bookmark Bridge",
-        "icon": "$(symbol-string)"
+        "icon": "$(eye)"
       },
       {
         "command": "codeBookmarks.openPersistenceFile",

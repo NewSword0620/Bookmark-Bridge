@@ -25,6 +25,22 @@ export const LABEL_DISPLAY_DESCRIPTION: Record<LabelDisplay, string> = {
   start: 'Labels at the start of the line',
 };
 
+/** Short form used by the status bar indicator. */
+export const LABEL_DISPLAY_SHORT: Record<LabelDisplay, string> = {
+  off: 'hidden',
+  hover: 'hover',
+  inline: 'end of line',
+  start: 'start of line',
+};
+
+/** Entry shown in the mode picker. */
+export const LABEL_DISPLAY_PICKER: Record<LabelDisplay, { title: string; detail: string; icon: string }> = {
+  off: { title: 'Hidden', detail: 'Only the gutter icon and the line highlight', icon: 'circle-slash' },
+  hover: { title: 'On hover', detail: 'Label, snippet and location in the line hover', icon: 'eye' },
+  inline: { title: 'At the end of the line', detail: 'Label appended after the code', icon: 'arrow-right' },
+  start: { title: 'At the start of the line', detail: 'Label in front of the code, always visible', icon: 'arrow-left' },
+};
+
 function normalizeMode(value: string | undefined): LabelDisplay {
   return LABEL_DISPLAY_CYCLE.includes(value as LabelDisplay) ? (value as LabelDisplay) : 'off';
 }
@@ -38,6 +54,10 @@ export class BookmarkDecorations implements vscode.Disposable {
   private readonly labelTypes = new Map<string, vscode.TextEditorDecorationType>();
   private readonly disposables: vscode.Disposable[] = [];
   private labelDisplay: LabelDisplay;
+  private readonly onDidChangeLabelDisplayEmitter = new vscode.EventEmitter<LabelDisplay>();
+
+  /** Fires whenever the editor label mode changes. */
+  readonly onDidChangeLabelDisplay = this.onDidChangeLabelDisplayEmitter.event;
 
   constructor(
     private readonly context: vscode.ExtensionContext,
@@ -83,14 +103,7 @@ export class BookmarkDecorations implements vscode.Disposable {
     this.disposeLabelTypes();
     await this.context.globalState.update(LABEL_DISPLAY_KEY, mode);
     this.refreshAll();
-  }
-
-  /** Advances to the next mode and returns the new one. */
-  async cycleLabelDisplay(): Promise<LabelDisplay> {
-    const index = LABEL_DISPLAY_CYCLE.indexOf(this.labelDisplay);
-    const next = LABEL_DISPLAY_CYCLE[(index + 1) % LABEL_DISPLAY_CYCLE.length];
-    await this.setLabelDisplay(next);
-    return next;
+    this.onDidChangeLabelDisplayEmitter.fire(mode);
   }
 
   private createTypes(): void {
@@ -200,6 +213,7 @@ export class BookmarkDecorations implements vscode.Disposable {
   dispose(): void {
     this.lineType?.dispose();
     this.disposeLabelTypes();
+    this.onDidChangeLabelDisplayEmitter.dispose();
     for (const disposable of this.disposables) {
       disposable.dispose();
     }

@@ -69,7 +69,7 @@ Bookmark Bridge closes that loop:
 | Jump to next / previous bookmark in the file | `Ctrl+Alt+Right` / `Ctrl+Alt+Left` |
 | **Reveal bookmark under the cursor in the view** | `Ctrl+Alt+B` · `Cmd+Alt+B` |
 | List bookmarks (current file / all files) | `Ctrl+Alt+J` / `Ctrl+Alt+Shift+J` |
-| Cycle label display mode (off → hover → end of line → start of line) | `Ctrl+Alt+Shift+L` · `Cmd+Alt+Shift+L` |
+| Choose the label display mode (hidden / hover / end of line / start of line) | `Ctrl+Alt+Shift+L` · `Cmd+Alt+Shift+L` |
 | Remove bookmarks of the current file | *Bookmark Bridge* submenu in the editor context menu |
 
 Right-click in the editor → **Bookmark Bridge** to reach every action from a
@@ -82,7 +82,7 @@ single submenu.
 | `+` | Add a bookmark on the current line |
 | list | List bookmarks of all files |
 | trash | Remove all bookmarks |
-| `ab` | Cycle label display: hidden → hover → end of line → start of line |
+| `ab` | Pick the label display mode (hidden / hover / end of line / start of line) |
 | merge | **Merge bookmarks from a JSON file…** (file picker + confirmation) |
 | `{}` | Open the bookmarks JSON file |
 
@@ -98,9 +98,10 @@ single submenu.
 | `codeBookmarks.persistenceFile` | `${workspaceFolder}/.vscode/bookmarks.json` | Path of that file. Supports `~` and `${workspaceFolder}`, or any absolute path for one central file. |
 | `codeBookmarks.preserveFocusWhenOpeningFromTree` | `false` | Keep the focus in the view while browsing bookmarks with the arrow keys. |
 
-The editor label mode is intentionally **not** a setting: use the `ab` button in
-the view title or `Ctrl+Alt+Shift+L` to cycle it. The choice is remembered across
-windows.
+The editor label mode is intentionally **not** a setting. Click the `ab` button
+in the view title, the status bar item (`🔖 Labels: …`) or press
+`Ctrl+Alt+Shift+L` to open the mode picker; the active mode is marked in the list
+and always visible in the status bar. The choice is remembered across windows.
 
 ## JSON file format
 
