@@ -2,6 +2,14 @@
 
 All notable changes to **Bookmark Bridge** are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- The bookmark hover is now shown only in the *On hover* mode. It used to appear
+  in the *end of line* and *start of line* modes as well, where the label is
+  already visible.
+
 ## [1.1.0] - 2026-11-10
 
 ### Changed

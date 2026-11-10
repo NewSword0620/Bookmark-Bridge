@@ -2,7 +2,7 @@
   "name": "two-way-bookmarks",
   "displayName": "Bookmark Bridge — Two-Way Bookmarks",
   "description": "Two-way bookmarks: jump from a bookmark in the tree to the code, and from the code straight back to the bookmark in the tree view.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "newsword0620",
   "author": {
     "name": "NewSword0620"

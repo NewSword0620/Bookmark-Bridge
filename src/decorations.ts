@@ -162,10 +162,12 @@ export class BookmarkDecorations implements vscode.Disposable {
 
       lineRanges.push({
         range: new vscode.Range(bookmark.line, 0, bookmark.line, 0),
+        // The hover belongs to the "On hover" mode only: in the inline modes the
+        // label is already on screen.
         hoverMessage:
-          mode === 'off'
-            ? undefined
-            : hoverMessage(bookmark.label, bookmark.preview, `${location}:${bookmark.line + 1}`),
+          mode === 'hover'
+            ? hoverMessage(bookmark.label, bookmark.preview, `${location}:${bookmark.line + 1}`)
+            : undefined,
       });
 
       if (!labelsInline || !bookmark.label) {
