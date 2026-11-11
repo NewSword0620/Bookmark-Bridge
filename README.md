@@ -39,9 +39,10 @@ Bookmark Bridge closes that loop:
   no bookmark, the nearest bookmark within `revealDistance` lines (default 20) is
   used, and you are asked before jumping further away.
 * **Automatic sync** — while the view is visible, moving the cursor onto a
-  bookmarked line selects that bookmark in the tree, without stealing the focus
-  from the editor (`autoRevealInTree`, on by default). A file group you collapsed
-  is only highlighted, never expanded.
+  bookmarked line highlights that row in the tree (`autoRevealInTree`, on by
+  default), and the highlight disappears again when the cursor leaves it. The
+  editor keeps the focus throughout. A file group you collapsed stays collapsed;
+  its file row is highlighted instead.
 
 ## Features
 
@@ -54,6 +55,8 @@ Bookmark Bridge closes that loop:
 * File-grouped tree view with inline *star*, *edit label*, *clear label* and
   *remove* actions; starred bookmarks get a yellow star and are collected in a
   **Starred** group at the top of the view.
+* One button switches the view between that grouping and a **flat list** of every
+  bookmark (`path:line` next to each entry).
 * **Bookmarks survive edits**: line numbers follow inserted/removed lines and
   file renames.
 * **Live JSON persistence**: bookmarks are mirrored to a JSON file in real time,
@@ -72,6 +75,7 @@ Bookmark Bridge closes that loop:
 | **Reveal bookmark under the cursor in the view** | `Ctrl+Alt+B` · `Cmd+Alt+B` |
 | List bookmarks (current file / all files) | `Ctrl+Alt+J` / `Ctrl+Alt+Shift+J` |
 | Choose the label display mode (hidden / hover / end of line / start of line) | `Ctrl+Alt+Shift+L` · `Cmd+Alt+Shift+L` |
+| Star / unstar a bookmark | inline star button in the view (right-click menu works too) |
 | Remove bookmarks of the current file | *Bookmark Bridge* submenu in the editor context menu |
 
 Right-click in the editor → **Bookmark Bridge** to reach every action from a
@@ -87,7 +91,9 @@ single submenu.
 | trash | Remove all bookmarks |
 | eye | Pick the label display mode (hidden / hover / end of line / start of line) |
 | file + | **Merge bookmarks from a JSON file…** (file picker + confirmation) |
-| `{}` | Open the bookmarks JSON file |
+| list-tree / list-flat | Switch between grouped (file groups + Starred) and a flat list |
+
+`Open Bookmarks JSON File` is available from the command palette.
 
 Every bookmark row additionally shows inline *star*, *edit label*, *clear label*
 and *remove* buttons on hover.
@@ -96,7 +102,7 @@ and *remove* buttons on hover.
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| `codeBookmarks.autoRevealInTree` | `true` | Keep the tree selection in sync with the cursor while the view is visible. |
+| `codeBookmarks.autoRevealInTree` | `true` | Highlight the bookmark under the cursor in the view (and clear it again) while the view is visible. |
 | `codeBookmarks.revealDistance` | `20` | Fallback distance (in lines) for *Reveal Bookmark Under Cursor*. `0` disables the fallback. |
 | `codeBookmarks.showGutterIcon` | `true` | Show the bookmark icon in the gutter. |
 | `codeBookmarks.showLineHighlight` | `true` | Highlight bookmarked lines. |
@@ -172,7 +178,9 @@ Issues and feature requests are welcome in the
 - 支持多光标打书签、带标签书签
 - 标签四种显示方式：隐藏 / 悬停 / 行尾 / 行首，用标题栏眼睛按钮、状态栏或 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> 选择
 - 书签可加星收藏，星标条目会汇总到顶部的 **Starred** 分组
+- 视图可在「按文件分组」与「平铺列表」之间一键切换
+- 光标停在书签行时，侧栏对应行高亮（光标离开即消失，不会一直粘着）
 - 浅蓝色书签图标与行高亮，暗色/亮色主题都清晰
 - 编辑时行号自动跟随，文件重命名也不会错位；自动同步时不会强制展开你已折叠的文件
-- 书签实时写入 `.vscode/bookmarks.json`，可手动编辑、跨机器同步；也可从任意 JSON 文件合并（合并前确认）
+- 书签实时写入 `.vscode/bookmarks.json`，可手动编辑、跨机器同步；也可从任意 JSON 文件合并（合并前确认；打开 JSON 文件的命令在命令面板里）
 - 全部展开 / 折叠一键切换，右键菜单统一收纳在 **Bookmark Bridge** 二级菜单里

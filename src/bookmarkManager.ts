@@ -167,6 +167,12 @@ export class BookmarkManager implements vscode.Disposable {
 
   /** Entries of the JSON file that belong to other workspaces; kept verbatim. */
   private foreignEntries: PersistedEntry[] = [];
+  /**
+   * Paths this workspace has ever written to the file. Needed to tell "another
+   * project's entry" apart from "an entry of mine whose last bookmark was just
+   * deleted" — the latter has to be dropped, not preserved.
+   */
+  private readonly knownPaths = new Set<string>();
   private persistUri: vscode.Uri | undefined;
   private watcher: vscode.FileSystemWatcher | undefined;
   private lastWrittenText: string | undefined;
@@ -436,8 +442,11 @@ export class BookmarkManager implements vscode.Disposable {
       return;
     }
 
-    const { imported, foreign } = await this.resolveEntries(entries);
+    const { imported, foreign, owned } = await this.resolveEntries(entries);
     this.foreignEntries = foreign;
+    for (const ownedPath of owned) {
+      this.knownPaths.add(ownedPath);
+    }
 
     if (imported.size === 0 && this.store.size > 0) {
       // Nothing usable in the file but we do have bookmarks in memory: keep them
@@ -489,9 +498,10 @@ export class BookmarkManager implements vscode.Disposable {
    */
   private async resolveEntries(
     entries: PersistedEntry[]
-  ): Promise<{ imported: Map<string, Bookmark[]>; foreign: PersistedEntry[] }> {
+  ): Promise<{ imported: Map<string, Bookmark[]>; foreign: PersistedEntry[]; owned: string[] }> {
     const collected = new Map<string, Map<number, Bookmark>>();
     const foreign: PersistedEntry[] = [];
+    const owned: string[] = [];
 
     for (const entry of entries) {
       const uri = await this.resolveEntryPath(entry.path);
@@ -499,6 +509,7 @@ export class BookmarkManager implements vscode.Disposable {
         foreign.push(entry);
         continue;
       }
+      owned.push(entry.path);
       const key = uri.toString();
       let byNumber = collected.get(key);
       if (!byNumber) {
@@ -529,7 +540,7 @@ export class BookmarkManager implements vscode.Disposable {
       }
     }
 
-    return { imported, foreign };
+    return { imported, foreign, owned };
   }
 
   /** Reads the JSON file and returns only the bookmarks of this workspace. */
@@ -644,13 +655,14 @@ export class BookmarkManager implements vscode.Disposable {
     if (!entries) {
       return;
     }
-    const ours = new Set<string>();
+    // Everything we write in this run is "ours" from now on, even if its last
+    // bookmark disappears later.
     for (const key of this.store.keys()) {
-      ours.add(this.entryPathFor(vscode.Uri.parse(key)));
+      this.knownPaths.add(this.entryPathFor(vscode.Uri.parse(key)));
     }
     const foreign: PersistedEntry[] = [];
     for (const entry of entries) {
-      if (!ours.has(entry.path)) {
+      if (!this.knownPaths.has(entry.path)) {
         foreign.push(entry);
       }
     }

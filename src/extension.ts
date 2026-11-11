@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { Bookmark, BookmarkManager, makePreview } from './bookmarkManager';
-import { BookmarkNode, BookmarksTreeProvider, FileNode, TreeNode } from './bookmarksTree';
+import { BookmarkNode, BookmarksTreeProvider, FileNode, TreeNode, ViewMode } from './bookmarksTree';
 import {
   BookmarkDecorations,
   LABEL_DISPLAY_CYCLE,
@@ -21,7 +21,8 @@ function config(): vscode.WorkspaceConfiguration {
 
 export function activate(context: vscode.ExtensionContext): void {
   manager = new BookmarkManager(context);
-  provider = new BookmarksTreeProvider(manager);
+  const storedViewMode = context.globalState.get<ViewMode>('codeBookmarks.viewMode', 'grouped');
+  provider = new BookmarksTreeProvider(manager, storedViewMode);
   const decorations = new BookmarkDecorations(context, manager);
 
   treeView = vscode.window.createTreeView('codeBookmarks.view', {
@@ -33,6 +34,12 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // The expand/collapse button is a single button whose icon follows this key.
   void vscode.commands.executeCommand('setContext', 'codeBookmarks.treeExpanded', true);
+  // The grouping button follows the current view mode.
+  void vscode.commands.executeCommand(
+    'setContext',
+    'codeBookmarks.viewGrouped',
+    storedViewMode === 'grouped'
+  );
 
   // Track which groups the user collapsed, so the silent "follow the cursor"
   // reveal can highlight a collapsed file instead of forcing it open.
@@ -41,13 +48,31 @@ export function activate(context: vscode.ExtensionContext): void {
       const key = provider.groupKey(e.element);
       if (key) {
         provider.setGroupExpanded(key, true);
+        reapplySyncSelection(treeView, key);
       }
     }),
     treeView.onDidCollapseElement((e) => {
       const key = provider.groupKey(e.element);
       if (key) {
         provider.setGroupExpanded(key, false);
+        reapplySyncSelection(treeView, key);
       }
+    }),
+    // Re-sync the highlight when the view is shown again.
+    treeView.onDidChangeVisibility((e) => {
+      if (!e.visible || !config().get<boolean>('autoRevealInTree', true)) {
+        return;
+      }
+      const editor = vscode.window.activeTextEditor;
+      const line = editor?.selection.active.line;
+      if (!editor || line === undefined) {
+        return;
+      }
+      const uri = editor.document.uri.toString();
+      if (!manager.has(uri, line)) {
+        return;
+      }
+      void provider.selectBookmark(treeView, uri, line);
     })
   );
 
@@ -84,6 +109,8 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('codeBookmarks.listFromAllFiles', () => listBookmarks(true)),
     vscode.commands.registerCommand('codeBookmarks.clear', () => clearBookmarks(false)),
     vscode.commands.registerCommand('codeBookmarks.clearFromAllFiles', () => clearBookmarks(true)),
+    vscode.commands.registerCommand('codeBookmarks.groupByFile', () => setViewMode('grouped', context)),
+    vscode.commands.registerCommand('codeBookmarks.flatList', () => setViewMode('flat', context)),
     vscode.commands.registerCommand('codeBookmarks.expandAll', () => setTreeExpanded(true)),
     vscode.commands.registerCommand('codeBookmarks.collapseAll', () => setTreeExpanded(false)),
     vscode.commands.registerCommand('codeBookmarks.revealInTree', () => revealCurrentLineInTree(false)),
@@ -92,10 +119,10 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('codeBookmarks.mergeFromFile', () => mergeFromPickedFile()),
     vscode.commands.registerCommand('codeBookmarks.revealNearestInTree', () => revealCurrentLineInTree(true)),
     vscode.commands.registerCommand('codeBookmarks._openBookmark', (node?: BookmarkNode) => {
-      if (node) {
-        return openBookmark(node.uri, node.line, node.column);
+      if (!node) {
+        return;
       }
-      return undefined;
+      return openBookmark(node.uri, node.line, node.column);
     }),
     vscode.commands.registerCommand('codeBookmarks.editLabel', (node?: BookmarkNode) => {
       if (node) {
@@ -137,27 +164,53 @@ export function activate(context: vscode.ExtensionContext): void {
       if (!config().get<boolean>('autoRevealInTree', true)) {
         return;
       }
-      if (!treeView.visible || e.textEditor !== vscode.window.activeTextEditor) {
+      if (e.textEditor !== vscode.window.activeTextEditor) {
         return;
       }
       const uri = e.textEditor.document.uri.toString();
       const line = e.selections[0]?.active.line;
+
       if (line === undefined || !manager.has(uri, line)) {
+        // The cursor left every bookmark: drop the highlight again.
+        provider.clearSyncedSelection();
         return;
       }
-      void provider.revealInTree(treeView, uri, line, false);
+      if (!treeView.visible) {
+        return;
+      }
+      void provider.selectBookmark(treeView, uri, line);
     })
   );
 }
 
-export function deactivate(): void {
-  // Everything is disposed through context.subscriptions.
+export async function deactivate(): Promise<void> {
+  // Flush the pending (debounced) save before the extension goes away.
+  await manager?.saveNow();
 }
 
 /**
  * Expands or collapses every group and flips the icon of the single title bar
  * button (the button shows "collapse" while the tree is expanded).
  */
+/**
+ * Expanding or collapsing a file group changes what the sync can point at (bookmark
+ * row vs. file row). Re-apply it, since the cursor may not have moved at all.
+ */
+function reapplySyncSelection(treeView: vscode.TreeView<TreeNode>, key: string): void {
+  const synced = provider.getSyncedSelection();
+  if (synced && synced.uri === key) {
+    void provider.selectBookmark(treeView, synced.uri, synced.line, true);
+  }
+}
+
+/** Switches the view between file groups (with a Starred group) and a flat list. */
+async function setViewMode(mode: ViewMode, context: vscode.ExtensionContext): Promise<void> {
+  provider.setViewMode(mode);
+  await context.globalState.update('codeBookmarks.viewMode', mode);
+  await vscode.commands.executeCommand('setContext', 'codeBookmarks.viewGrouped', mode === 'grouped');
+  status(mode === 'grouped' ? 'Bookmarks grouped by file' : 'Bookmarks in a flat list');
+}
+
 async function setTreeExpanded(expanded: boolean): Promise<void> {
   provider.setAllExpanded(expanded);
   await vscode.commands.executeCommand('setContext', 'codeBookmarks.treeExpanded', expanded);
@@ -580,7 +633,7 @@ async function revealCurrentLineInTree(nearestOnly: boolean): Promise<void> {
     return;
   }
 
-  const revealed = await provider.revealInTree(treeView, uri, target.line, true);
+  const revealed = await provider.revealInTree(treeView, uri, target.line);
   if (!revealed) {
     vscode.window.showWarningMessage('Could not reveal the bookmark in the Bookmarks view.');
   }

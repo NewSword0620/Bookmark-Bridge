@@ -2,7 +2,7 @@
 
 All notable changes to **Bookmark Bridge** are documented in this file.
 
-## [1.2.0] - 2026-11-10
+## [1.2.0] - 2026-11-11
 
 ### Added
 
@@ -16,16 +16,45 @@ All notable changes to **Bookmark Bridge** are documented in this file.
   while the tree is expanded and flips to *expand* after collapsing. The
   `Expand All Bookmarks` / `Collapse All Bookmarks` commands are also in the
   command palette.
+- A **grouping toggle** in the view title: switch between *grouped by file* (with
+  the Starred group) and a **flat list** of every bookmark, sorted by file and
+  line. The choice is remembered across windows.
 
 ### Changed
 
 - The *merge bookmarks* button in the view title now uses the file-add icon.
 
+### Removed
+
+- The *Open bookmarks JSON file* button left the view title to make room for the
+  grouping toggle. The `Open Bookmarks JSON File` command is still in the command
+  palette.
+
 ### Fixed
 
-- The silent cursor sync no longer force-expands a file group you collapsed: it
-  only highlights that file row, leaving the layout you arranged untouched.
-  `Ctrl+Alt+B` still expands and focuses the bookmark.
+- The bookmark under the cursor now gets the **native row highlight** again, and
+  the highlight is removed as soon as the cursor leaves it: the item id is rotated
+  so VS Code drops the selection (the API has no `clearSelection`). The row no
+  longer stays selected — with its inline buttons visible — after you move away.
+- A starred bookmark is visible twice (file group and Starred group); the Starred
+  copy now mirrors the highlight of the selected row.
+- Deleting every bookmark of a file now also removes that file's entry from the
+  JSON file. Previously the entry was mistaken for another project's data and
+  written back, so the bookmarks reappeared after a reload.
+- The row selected by `Ctrl+Alt+B` is now cleared by the cursor sync like any other
+  highlight instead of staying selected.
+- The highlight no longer gets stuck on the file row after the tree state drifts: the
+  open/closed bookkeeping is healed from VS Code (it only asks for the children of
+  an open group), and expand/collapse events caused by internal refreshes are
+  ignored. If the bookmark row cannot be revealed, the file row is highlighted
+  instead, and clearing follows whichever row was selected.
+- Expanding or collapsing a file group re-applies the cursor highlight immediately,
+  so the bookmark row lights up without moving the cursor away first. While the
+  group is collapsed the synced bookmark keeps updating even though several
+  bookmarks share the same file row, so expanding always lands on the right line.
+- The sync no longer force-expands a file group you collapsed; while such a group
+  is collapsed its file row is highlighted instead.
+- Repeated syncs of the same bookmark are skipped.
 - The bookmark hover is now shown only in the *On hover* mode. It used to appear
   in the *end of line* and *start of line* modes as well, where the label is
   already visible.

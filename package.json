@@ -180,6 +180,18 @@
         "icon": "$(json)"
       },
       {
+        "command": "codeBookmarks.flatList",
+        "title": "Show Bookmarks as a Flat List",
+        "category": "Bookmark Bridge",
+        "icon": "$(list-flat)"
+      },
+      {
+        "command": "codeBookmarks.groupByFile",
+        "title": "Group Bookmarks by File",
+        "category": "Bookmark Bridge",
+        "icon": "$(list-tree)"
+      },
+      {
         "command": "codeBookmarks.mergeFromFile",
         "title": "Merge Bookmarks from JSON File...",
         "category": "Bookmark Bridge",
@@ -235,6 +247,14 @@
         {
           "command": "codeBookmarks.toggleStar",
           "when": "false"
+        },
+        {
+          "command": "codeBookmarks.flatList",
+          "when": "codeBookmarks.viewGrouped"
+        },
+        {
+          "command": "codeBookmarks.groupByFile",
+          "when": "!codeBookmarks.viewGrouped"
         },
         {
           "command": "codeBookmarks.clearLabel",
@@ -318,12 +338,12 @@
         {
           "command": "codeBookmarks.expandAll",
           "group": "navigation@2",
-          "when": "view == codeBookmarks.view && !codeBookmarks.treeExpanded"
+          "when": "view == codeBookmarks.view && codeBookmarks.viewGrouped && !codeBookmarks.treeExpanded"
         },
         {
           "command": "codeBookmarks.collapseAll",
           "group": "navigation@2",
-          "when": "view == codeBookmarks.view && codeBookmarks.treeExpanded"
+          "when": "view == codeBookmarks.view && codeBookmarks.viewGrouped && codeBookmarks.treeExpanded"
         },
         {
           "command": "codeBookmarks.clearFromAllFiles",
@@ -341,9 +361,14 @@
           "when": "view == codeBookmarks.view"
         },
         {
-          "command": "codeBookmarks.openPersistenceFile",
+          "command": "codeBookmarks.flatList",
           "group": "navigation@7",
-          "when": "view == codeBookmarks.view"
+          "when": "view == codeBookmarks.view && codeBookmarks.viewGrouped"
+        },
+        {
+          "command": "codeBookmarks.groupByFile",
+          "group": "navigation@7",
+          "when": "view == codeBookmarks.view && !codeBookmarks.viewGrouped"
         }
       ],
       "view/item/context": [
